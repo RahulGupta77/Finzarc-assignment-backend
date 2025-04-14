@@ -13,28 +13,29 @@ const register = async (req, res) => {
 
     await user.save();
 
-    res.status(201).send("User created successfully");
+    res.status(201).json({ message: "User created successfully" });
   } catch (err) {
     if (err.code === 11000 && err.keyPattern && err.keyPattern.username) {
-      return res.status(409).send("Username already exists");
+      return res.status(409).json({ error: "Username already exists" });
     }
 
     console.error("Registration error:", err.message);
-    res.status(500).send("Something went wrong during registration");
+    res.status(500).json({ error: "Something went wrong during registration" });
   }
 };
 
 const login = async (req, res) => {
-  const { username, password } = req.body;
   try {
-    const user = await User.findOne({ username: username });
+    const { username, password } = req.body;
+    const user = await User.findOne({ username });
+
     if (!user) {
-      throw new Error("User not Found");
+      return res.status(404).json({ error: "User not found" });
     }
 
     const isPasswordCorrect = await user.validatePassword(password);
     if (!isPasswordCorrect) {
-      throw new Error("Incorrect Password");
+      return res.status(401).json({ error: "Incorrect password" });
     }
 
     const token = await user.getJWT();
@@ -46,10 +47,10 @@ const login = async (req, res) => {
       sameSite: "None",
     });
 
-    res.status(201).send("Login Successfull");
+    res.status(200).json({ message: "Login successful" });
   } catch (err) {
-    res.status(400).send("Invalid credentials");
-    console.log(err.message);
+    console.error("Login error:", err.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 

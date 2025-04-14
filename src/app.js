@@ -12,8 +12,12 @@ app.use(
   cors({
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
-    origin: ["http://localhost:3000", ""],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "https://finzarc.rahulgupta.tech",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   })
 );
 app.options("*", cors());
